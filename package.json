@@ -1,6 +1,24 @@
 {
   "name": "sequey",
   "version": "0.1.0",
+  "description": "Serialize asynchronous function calls by key with FIFO queues, pending limits, and cancellation.",
+  "keywords": [
+    "async",
+    "concurrency",
+    "fifo",
+    "queue",
+    "serialization",
+    "typescript"
+  ],
+  "homepage": "https://github.com/unsady/sequey",
+  "bugs": {
+    "url": "https://github.com/unsady/sequey/issues"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unsady/sequey.git"
+  },
   "files": [
     "dist"
   ],
@@ -18,8 +36,8 @@
     "lint": "oxlint --config oxlint.config.ts",
     "format": "oxfmt --config oxfmt.config.ts --write .",
     "format:check": "oxfmt --config oxfmt.config.ts --check .",
-    "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest --passWithNoTests",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "devDependencies": {
