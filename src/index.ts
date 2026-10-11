@@ -1,10 +1,10 @@
 export { QueueFullError } from './errors.js'
-export { serialize } from './serialize.js'
+export { createSequencer } from './sequencer.js'
 export type {
+  CompositeKey,
   Key,
-  KeyField,
-  KeySelector,
-  Serialized,
-  SerializeOptions,
-  SignalSelector,
+  OperationContext,
+  RunOptions,
+  Sequencer,
+  SequencerOptions,
 } from './types.js'

@@ -1,7 +1,7 @@
 {
   "name": "sequey",
   "version": "0.1.0",
-  "description": "Serialize asynchronous function calls by key with FIFO queues, pending limits, and cancellation.",
+  "description": "Run operations by key with FIFO queues, pending limits, and cancellation.",
   "keywords": [
     "async",
     "concurrency",
@@ -31,7 +31,7 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint --config oxlint.config.ts",
     "format": "oxfmt --config oxfmt.config.ts --write .",

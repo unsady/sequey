@@ -1,31 +1,17 @@
 import { Queue } from './queue.js'
-import type { KeySelector } from './types.js'
+import type { Key } from './types.js'
 
 interface Entry {
-  children: Map<unknown, Entry>
+  children: Map<Key, Entry>
   queue: Queue | undefined
-}
-
-export function createKeySelector<Args extends unknown[]>(by: KeySelector<Args>) {
-  if (typeof by === 'function') {
-    return (...args: Args) => [by(...args)]
-  }
-
-  const fields = typeof by === 'string' ? [by] : [...by]
-
-  return (...args: Args) => {
-    const first: Args[0] = args[0]
-
-    return fields.map((field) => first[field])
-  }
 }
 
 export function createQueues(maxPending: number) {
   const root: Entry = { children: new Map(), queue: undefined }
 
-  return (keys: readonly unknown[]): Queue => {
+  return (keys: readonly Key[]): Queue => {
     let entry = root
-    const path: { parent: Entry; key: unknown; entry: Entry }[] = []
+    const path: { parent: Entry; key: Key; entry: Entry }[] = []
 
     for (const key of keys) {
       let child = entry.children.get(key)
