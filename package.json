@@ -1,6 +1,6 @@
 {
   "name": "sequey",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Run operations by key with FIFO queues, pending limits, and cancellation.",
   "keywords": [
     "async",
