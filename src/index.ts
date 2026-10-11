@@ -1,5 +1,5 @@
 export { QueueFullError } from './errors.js'
-export { createSequencer } from './sequencer.js'
+export { sequence } from './sequence.js'
 export type {
   CompositeKey,
   Key,

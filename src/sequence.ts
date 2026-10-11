@@ -2,7 +2,7 @@ import { createQueues } from './keys.js'
 import type { Sequencer, SequencerOptions } from './types.js'
 import { validateMaxPending } from './validation.js'
 
-export function createSequencer(options: SequencerOptions = {}): Sequencer {
+export function sequence(options: SequencerOptions = {}): Sequencer {
   const maxPending = options.maxPending === undefined ? Infinity : options.maxPending
 
   validateMaxPending(maxPending)

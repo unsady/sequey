@@ -11,7 +11,7 @@ npm install sequey
 ```ts
 import { writeFile } from 'node:fs/promises'
 
-import { createSequencer } from 'sequey'
+import { sequence } from 'sequey'
 
 interface Chat {
   id: string
@@ -25,7 +25,7 @@ async function saveChat(
   await writeFile(`./${chat.id}.txt`, chat.content, options)
 }
 
-const run = createSequencer()
+const run = sequence()
 
 await Promise.all([
   run(() => saveChat({ id: '1', content: 'first' }), '1'),
@@ -80,7 +80,7 @@ Composite keys match by their elements and order, not the array's identity. Scal
 ## Max pending
 
 ```ts
-const run = createSequencer({ maxPending: 100 })
+const run = sequence({ maxPending: 100 })
 ```
 
 `maxPending` allows up to 100 waiting operations per key, excluding the current operation. Additional operations reject with `QueueFullError` without invoking their callbacks. By default, `maxPending` is `Infinity`.
