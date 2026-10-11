@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest'
 
-import { createSequencer, QueueFullError } from './index.js'
+import { sequence, QueueFullError } from './index.js'
 import type { CompositeKey, Key } from './index.js'
 
 function deferred() {
@@ -12,11 +12,11 @@ function deferred() {
   return { promise, resolve }
 }
 
-describe('createSequencer', () => {
+describe('sequence', () => {
   it('runs different operations with matching keys in FIFO order while other keys run independently', async () => {
     const gate = deferred()
     const started: number[] = []
-    const run = createSequencer()
+    const run = sequence()
     const first = run(
       async () => {
         started.push(1)
@@ -69,7 +69,7 @@ describe('createSequencer', () => {
     async (key) => {
       const gate = deferred()
       const entered = deferred()
-      const run = createSequencer()
+      const run = sequence()
       const first = run(async ({ signal }) => {
         expect(signal).toBeUndefined()
         entered.resolve()
@@ -93,7 +93,7 @@ describe('createSequencer', () => {
   )
 
   it('passes undefined in the context when no signal is supplied', async () => {
-    const run = createSequencer()
+    const run = sequence()
 
     await run(
       ({ signal }) => {
@@ -105,7 +105,7 @@ describe('createSequencer', () => {
   })
 
   it('lets a running operation handle cancellation through its context', async () => {
-    const run = createSequencer()
+    const run = sequence()
     const controller = new AbortController()
     const entered = deferred()
     const reason = new Error('cancelled')
@@ -132,8 +132,8 @@ describe('createSequencer', () => {
   it('serializes operations without a key in an independent default queue', async () => {
     const gate = deferred()
     const started: number[] = []
-    const run = createSequencer()
-    const other = createSequencer()
+    const run = sequence()
+    const other = sequence()
     const first = run(async ({ signal }) => {
       expect(signal).toBeUndefined()
       started.push(1)
@@ -166,7 +166,7 @@ describe('createSequencer', () => {
 
   it('applies pending limits to the default queue', async () => {
     const gate = deferred()
-    const run = createSequencer({ maxPending: 0 })
+    const run = sequence({ maxPending: 0 })
     const first = run(() => gate.promise)
     const rejected = vi.fn<() => void>()
 
@@ -180,8 +180,8 @@ describe('createSequencer', () => {
 
   it('keeps sequencer instances independent', async () => {
     const gate = deferred()
-    const run = createSequencer()
-    const other = createSequencer()
+    const run = sequence()
+    const other = sequence()
     const first = run(() => gate.promise, { key: 'a' })
 
     await expect(other(() => 42, { key: 'a' })).resolves.toBe(42)
@@ -192,7 +192,7 @@ describe('createSequencer', () => {
 
   it.each(['throw', 'reject'] as const)('continues after an operation %s', async (mode) => {
     const error = new Error('failure')
-    const run = createSequencer()
+    const run = sequence()
     const failed = run(
       () => {
         if (mode === 'throw') {
@@ -216,7 +216,7 @@ describe('createSequencer', () => {
 
       return 42
     })
-    const run = createSequencer({ maxPending: 1 })
+    const run = sequence({ maxPending: 1 })
     const first = run(invoke, { key: 'a' })
     const second = run(invoke, { key: 'a' })
     const rejected = vi.fn<() => void>()
@@ -235,7 +235,7 @@ describe('createSequencer', () => {
   it('allows only the current operation when maxPending is zero', async () => {
     const gate = deferred()
     const invoke = vi.fn<() => Promise<void>>(() => gate.promise)
-    const run = createSequencer({ maxPending: 0 })
+    const run = sequence({ maxPending: 0 })
     const first = run(invoke, { key: 'a' })
 
     await expect(run(invoke, { key: 'a' })).rejects.toBeInstanceOf(QueueFullError)
@@ -251,7 +251,7 @@ describe('createSequencer', () => {
     const controller = new AbortController()
     const reason = new Error('cancelled')
     const invoke = vi.fn<() => number>(() => 42)
-    const run = createSequencer()
+    const run = sequence()
 
     controller.abort(reason)
 
@@ -265,7 +265,7 @@ describe('createSequencer', () => {
     const started: number[] = []
     const controller = new AbortController()
     const reason = new Error('cancelled')
-    const run = createSequencer({ maxPending: 1 })
+    const run = sequence({ maxPending: 1 })
     const first = run(
       async () => {
         started.push(1)
@@ -304,7 +304,7 @@ describe('createSequencer', () => {
     const entered = deferred()
     const controller = new AbortController()
     const started: number[] = []
-    const run = createSequencer()
+    const run = sequence()
     const first = run(
       async () => {
         started.push(1)
@@ -358,7 +358,7 @@ describe('createSequencer', () => {
     async ({ first, matching, distinct }) => {
       const gate = deferred()
       const started: number[] = []
-      const run = createSequencer()
+      const run = sequence()
       const current = run(
         async () => {
           started.push(1)
@@ -397,7 +397,7 @@ describe('createSequencer', () => {
   )
 
   it.each([0, 1, Infinity])('accepts maxPending=%s', async (maxPending) => {
-    const run = createSequencer({ maxPending })
+    const run = sequence({ maxPending })
 
     await expect(run(() => 42, { key: 'a' })).resolves.toBe(42)
   })
@@ -405,7 +405,7 @@ describe('createSequencer', () => {
   it.each([-1, 0.5, NaN, -Infinity])(
     'rejects invalid maxPending=%s synchronously',
     (maxPending) => {
-      expect(() => createSequencer({ maxPending })).toThrow(RangeError)
+      expect(() => sequence({ maxPending })).toThrow(RangeError)
     },
   )
 })
